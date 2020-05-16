@@ -16,3 +16,11 @@ Optionally, you can provide a WIFI connection that should be used lateron to con
 ```sh
 bash prepare_alarm_SD.sh /dev/mmcblkX ./ArchLinuxARM-rpi-3-latest.tar.gz MyFancyWifiSSID MyFancyWifiPassphrase
 ```
+
+## connect to the target and run ansible
+First, connect to the standard alarm user to create.
+Therefore get the IP adress of your target and replace it in the `inventory.yml`
+Then, run the playbook restricting to the host `alarm`
+```sh
+ansible-playbook -i inventory.yml -l alarm playbook.yml
+```

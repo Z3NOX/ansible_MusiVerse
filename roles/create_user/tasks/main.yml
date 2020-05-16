@@ -1,0 +1,22 @@
+---
+- name: create user {{ username }}
+  include_tasks: create-user.yml
+  tags: [users]
+
+- name: grant sudo rights
+  block:
+    - name: Install required basic packages
+      pacman:
+        name:
+          - sudo
+        state: present
+      tags: [ pacman, packages ]
+    
+    - name: enable passwordless ssh
+      include_tasks: activate-pwless-ssh.yml
+      tags: [users]
+    
+    - name: grant user sudo rights, enable sudo for that
+      include_tasks: activate-sudo.yml
+      tags: [users, install]
+  when: use_sudo

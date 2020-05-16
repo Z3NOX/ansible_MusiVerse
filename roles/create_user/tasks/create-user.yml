@@ -1,0 +1,10 @@
+---
+- name: Create user "{{ username }}"
+  user:
+    name: "{{ username }}"
+    group: "users"
+    groups: "{{ usergroups }}"
+    password: "{{ userpasswd }}"
+    update_password: on_create
+    state: present
+  tags: [users]

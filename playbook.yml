@@ -1,0 +1,23 @@
+---
+
+- hosts: alarm
+  gather_facts: no
+  become_method: su
+  tasks:
+    - include_role:
+        name: pre-ansible
+        apply:
+          become: yes
+      vars:
+        keyring: "archlinuxarm"
+
+    - include_role:
+        name: create_user
+        apply:
+          become: yes
+      vars:
+        username: "muser"
+        userpasswd: "$6$lalallasalt$LfVEjZmo0alN6nr67WkOWaM/.N7JDha9rY0FIgJTQsQO2MACqE2tpV9CB9YBhJl1JCvp8MCPP6ALjJdKX5auB1"
+        usergroups: [wheel]
+        use_sudo: yes
+
