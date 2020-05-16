@@ -1,0 +1,9 @@
+---
+
+- name: Set up authorized keys for the user "{{ username }}"
+  authorized_key:
+    user: "{{ username }}"
+    key: "{{ item }}"
+  with_file:
+    - ~/.ssh/id_rsa.pub
+  become: yes

@@ -1,0 +1,11 @@
+---
+
+- name: delete user {{ deluser }}
+  user:
+    name: "{{ deluser }}"
+    remove: yes
+    state: absent
+    force: yes
+  become: yes
+  tags: [users]
+

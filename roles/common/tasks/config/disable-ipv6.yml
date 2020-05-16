@@ -1,0 +1,18 @@
+---
+
+- name: disable in sysctl
+  blockinfile:
+    path: /etc/sysctl.d/40-ipv6.conf
+    create: yes
+    block: |
+      # Disable IPv6
+      net.ipv6.conf.all.disable_ipv6 = 1
+      net.ipv6.conf.wlan0.disable_ipv6 = 1
+      net.ipv6.conf.eth0.disable_ipv6 = 1
+  register: ip_config
+
+- name: restart service
+  service:
+    name: systemd-sysctl
+    state: restarted
+  when: ip_config.changed

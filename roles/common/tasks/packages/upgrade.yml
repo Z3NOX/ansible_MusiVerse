@@ -1,0 +1,8 @@
+---
+
+- name: Update packages through pacman
+  pacman:
+    update_cache: yes
+    upgrade: yes
+  become: yes
+  tags: [pacman, packages, update]

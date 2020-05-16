@@ -1,0 +1,5 @@
+---
+
+- name: reboot
+  command: "reboot"
+  become: yes

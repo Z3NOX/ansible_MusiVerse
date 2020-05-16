@@ -21,3 +21,47 @@
         usergroups: [wheel]
         use_sudo: yes
 
+
+- hosts: musiverse
+  vars:
+  tasks:
+    - import_role:
+        name: common
+      become: yes
+      vars:
+        username: "muser"
+        hostname: "musiverse"
+        keyring: "archlinuxarm"
+        userpasswd: "$6$lalallasalt$LfVEjZmo0alN6nr67WkOWaM/.N7JDha9rY0FIgJTQsQO2MACqE2tpV9CB9YBhJl1JCvp8MCPP6ALjJdKX5auB1"
+        usergroups:
+          - wheel
+        deluser: "alarm"
+        timezone: "Europe/Berlin"
+        locale: "de_DE.UTF-8"
+        disable_ipv6: yes
+        packages:
+          - dnsmasq
+          - hostapd
+          - cronie
+          - sudo
+          - rsync
+          - git 
+          - tree
+          - base-devel
+          - ruby-bundler
+          - bind-tools
+          - tmux
+          - nginx
+          - htop
+          - jq
+
+    - include_role:
+        name: musiverse
+        apply:
+          become_user: "{{ username }}"
+      vars:
+        musiverse_repo: "https://github.com/Z3NOX/MusiVerse.git"
+        localSSID: "WifiSSID"
+        # create Passphrase using `wpa_passphrase $localSSID`:
+        localPSK: "fe49c00ad13a710319387443df8466979b4fe0348dc0f5c74ca2200b84a8279b"
+      when: no

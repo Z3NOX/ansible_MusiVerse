@@ -1,0 +1,8 @@
+---
+
+- name: Install required packages
+  pacman:
+    name: "{{ packages }}"
+    state: present
+  become: yes
+  tags: [pacman, packages]

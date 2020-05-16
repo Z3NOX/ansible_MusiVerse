@@ -1,0 +1,35 @@
+---
+
+- name: Check hostname 
+  slurp:
+    src: "/etc/hostname"
+  register: hostnamefile
+  tags: [install]
+
+- debug:
+    var: hostnamefile.content | b64decode
+
+- name: Assign hostname on Arch
+  command: hostnamectl set-hostname {{ hostname }}
+  when: ansible_facts['os_family'] == "Archlinux" and
+        hostnamefile.content | b64decode | replace('\n', '') != hostname
+  notify: reboot
+  become: yes
+  tags: [install]
+
+- name: Assign hostname not on Arch
+  hostname:
+    name: '{{ hostname }}'
+  when: ansible_facts['os_family'] != "Archlinux"
+  become: yes
+  tags: [install]
+  notify: reboot
+
+- name: Add to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '^127\.0\.0\.1[ \t]+localhost'
+    line: '127.0.0.1 localhost {{ hostname }}'
+    state: present
+  become: yes
+  tags: [install]

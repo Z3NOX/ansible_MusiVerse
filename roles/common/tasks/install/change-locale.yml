@@ -1,0 +1,16 @@
+---
+
+- name: configure locale
+  locale_gen:
+    name: "{{ locale }}"
+  become: yes
+  notify: reboot
+  tags: [install, locale]
+  
+- name: set locale for sessions
+  lineinfile:
+    path: /etc/locale.conf
+    regexp: "^LANG="
+    line: "LANG={{ locale }}"
+  become: yes
+  tags: [install, locale]

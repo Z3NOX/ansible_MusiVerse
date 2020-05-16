@@ -1,0 +1,25 @@
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+  become: yes
+  tags: [install]
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) ALL'
+    validate: 'visudo -cf %s'
+  become: yes
+  tags: [install]
+
+- name: Add sudoers users to wheel group
+  user: 
+    name: "{{ username }}"
+    groups: wheel
+    append: yes
+    state: present
+  become: yes
+  tags: [users]

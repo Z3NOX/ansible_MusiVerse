@@ -1,0 +1,55 @@
+---
+- name: initialize pacman keyring
+  include_tasks: packages/init-keyring.yml
+  tags: [pacman, packages]
+
+- name: Update packages through pacman
+  include_tasks: packages/upgrade.yml
+  tags: [pacman, packages, update]
+
+- name: install base packages (sudo, htop, git, tmux, ...)
+  include_tasks: packages/basic-packages.yml
+  tags: [pacman, packages]
+
+- name: create user {{ username }}
+  include_tasks: users/create-user.yml
+  tags: [users]
+
+- name: enable passwordless ssh
+  include_tasks: users/activate-pwless-ssh.yml
+  tags: [users]
+
+- name: grant user {{ username }} sudo rights, enable sudo for that
+  include_tasks: install/activate-sudo.yml
+  tags: [users, install]
+
+- name: delete default "alarm" user
+  include_tasks: users/delete-user.yml
+  when: deluser is defined
+  tags: [users]
+
+- name: change locale to UTF8
+  include_tasks: install/change-locale.yml
+  tags: [install, locale]
+
+- name: change hostname to {{ hostname }}
+  include_tasks: install/config-hostname.yml
+  tags: [install]
+
+- name: set timezone
+  include_tasks: install/timezone.yml
+  tags: [install]
+
+- name: install additional packages
+  include_tasks: packages/additional-packages.yml
+  tags: [pacman, packages]
+
+- name: disable IPv6
+  include_tasks: config/disable-ipv6.yml
+  when: disable_ipv6 is defined and disable_ipv6
+  tags: [config]
+
+# https://github.com/kewlfft/ansible-aur
+# - name: create AUR build user
+#   include tasks/aur-build-user.yml
+
