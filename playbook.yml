@@ -11,12 +11,13 @@
       vars:
         keyring: "archlinuxarm"
 
-    - include_role:
-        name: create_user
+    - include_tasks:
+        file: roles/common/tasks/users/create-sudo-user.yml
         apply:
           become: yes
       vars:
         username: "muser"
+        hostname: "musiverse"
         userpasswd: "$6$lalallasalt$LfVEjZmo0alN6nr67WkOWaM/.N7JDha9rY0FIgJTQsQO2MACqE2tpV9CB9YBhJl1JCvp8MCPP6ALjJdKX5auB1"
         usergroups: [wheel]
         use_sudo: yes
@@ -35,6 +36,7 @@
         userpasswd: "$6$lalallasalt$LfVEjZmo0alN6nr67WkOWaM/.N7JDha9rY0FIgJTQsQO2MACqE2tpV9CB9YBhJl1JCvp8MCPP6ALjJdKX5auB1"
         usergroups:
           - wheel
+        create_ssh_keypair: yes
         deluser: "alarm"
         timezone: "Europe/Berlin"
         locale: "de_DE.UTF-8"
@@ -42,6 +44,7 @@
         packages:
           - dnsmasq
           - hostapd
+          - ntp
           - cronie
           - sudo
           - rsync

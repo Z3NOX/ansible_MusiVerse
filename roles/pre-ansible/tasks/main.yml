@@ -2,11 +2,11 @@
 
 - debug: msg="{{ lookup('pipe','date \"+%Y-%m-%d %H:%M:%S\"') }}"
 
-- name: set time in order for DNSSEC to work.
-  raw: systemctl stop systemd-timesyncd.service || timedatectl set-time "{{ lookup('pipe','date +%Y-%m-%d') }} {{ lookup('pipe','date +%H:%M:%S') }}"
+- name: stop systemd-resolved time in order for DNSSEC to work.
+  raw: systemctl stop systemd-resolved.service
 
 - name: install python
-  raw: pacman-key --init && pacman-key --populate archlinuxarm && pacman --noconfirm -Syy && pacman --noconfirm -S python
+  raw: "pacman-key --init && pacman-key --populate {{ keyring }} && pacman --noconfirm -Syy && pacman --noconfirm -S python"
   register: raw
 
   # - debug:

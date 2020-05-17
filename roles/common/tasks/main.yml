@@ -11,17 +11,9 @@
   include_tasks: packages/basic-packages.yml
   tags: [pacman, packages]
 
-- name: create user {{ username }}
-  include_tasks: users/create-user.yml
+- name: create sudo user
+  include_tasks: users/create-sudo-user.yml
   tags: [users]
-
-- name: enable passwordless ssh
-  include_tasks: users/activate-pwless-ssh.yml
-  tags: [users]
-
-- name: grant user {{ username }} sudo rights, enable sudo for that
-  include_tasks: install/activate-sudo.yml
-  tags: [users, install]
 
 - name: delete default "alarm" user
   include_tasks: users/delete-user.yml

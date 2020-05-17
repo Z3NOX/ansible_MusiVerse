@@ -17,3 +17,4 @@
     owner: "{{ username }}"
     group: "users"
     comment: "{{ username }}@{{ hostname }}"
+  when: create_ssh_keypair is defined and create_ssh_keypair
