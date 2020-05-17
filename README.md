@@ -1,4 +1,14 @@
 # ansible provisioning for MusiVerse
+
+## requirements
+Download this git and install the required ansible roles from ansible galaxy into the galaxy directory:
+```sh
+git clone https://github.com/Z3NOX/ansible_MusiVerse
+cd ansible_MusiVerse
+export ANSIBLE_ROLES_PATH="$(pwd)/galaxy"
+ansible-galaxy install -r requirements.yml
+```
+
 ## prepare SD card
 Download an Arch Linux on ARM Image fitting your platform, e.g. using `wget` for the `aarch64` Raspberry Pis: 
 ```sh
@@ -24,4 +34,15 @@ Therefore get the IP adress of your target and replace it in the `inventory.yml`
 Then, run the playbook restricting to the host `alarm`:
 ```sh
 ansible-playbook -i inventory.yml -l alarm playbook.yml
+```
+
+## run provisioning
+The former step has created the standard user with sudo rights:
+- username: `muser`
+- password: `muser`
+
+This user is from now on used to do the rest of the provisioning:
+
+```sh
+ansible-playbook -i inventory.yml -l musiverse playbook.yml
 ```

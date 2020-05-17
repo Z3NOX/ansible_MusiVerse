@@ -27,6 +27,17 @@
   vars:
   tasks:
     - import_role:
+        name: geerlingguy.swap
+      become: yes
+      vars:
+        swap_file_path: "/swapfile"
+        swap_file_size_mb: "512"
+        swap_swappiness: '1'
+        swap_file_state: present
+        swap_file_create_command: "fallocate -l {{ swap_file_size_mb }}M {{ swap_file_path }}"
+      tags: [swap]
+
+    - import_role:
         name: common
       become: yes
       vars:
@@ -36,19 +47,21 @@
         userpasswd: "$6$lalallasalt$LfVEjZmo0alN6nr67WkOWaM/.N7JDha9rY0FIgJTQsQO2MACqE2tpV9CB9YBhJl1JCvp8MCPP6ALjJdKX5auB1"
         usergroups:
           - wheel
+        use_sudo: yes
         create_ssh_keypair: yes
         deluser: "alarm"
         timezone: "Europe/Berlin"
         locale: "de_DE.UTF-8"
         disable_ipv6: yes
         packages:
+          - pbzip2
           - dnsmasq
           - hostapd
           - ntp
           - cronie
           - sudo
           - rsync
-          - git 
+          - git
           - tree
           - base-devel
           - ruby-bundler
@@ -57,11 +70,13 @@
           - nginx
           - htop
           - jq
+      tags: [common]
 
     - include_role:
         name: musiverse
         apply:
           become_user: "{{ username }}"
+          tags: [musiverse]
       vars:
         musiverse_repo: "https://github.com/Z3NOX/MusiVerse.git"
         localSSID: "WifiSSID"

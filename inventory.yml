@@ -5,6 +5,7 @@ all:
     musiverse:
       ansible_host: 192.168.0.42
       ansible_user: muser
+      ansible_become_pass: muser
       ansible_ssh_common_args: "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
     alarm:
