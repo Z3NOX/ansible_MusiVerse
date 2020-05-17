@@ -1,6 +1,6 @@
 ---
 
-- name: Check hostname 
+- name: Check hostname
   slurp:
     src: "/etc/hostname"
   register: hostnamefile

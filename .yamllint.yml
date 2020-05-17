@@ -1,0 +1,5 @@
+---
+
+extends: relaxed
+
+indentation: {spaces: 1}

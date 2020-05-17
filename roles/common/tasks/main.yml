@@ -44,4 +44,3 @@
 # https://github.com/kewlfft/ansible-aur
 # - name: create AUR build user
 #   include tasks/aur-build-user.yml
-

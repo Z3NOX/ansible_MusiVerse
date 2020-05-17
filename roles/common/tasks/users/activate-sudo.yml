@@ -16,7 +16,7 @@
   tags: [install]
 
 - name: Add sudoers users to wheel group
-  user: 
+  user:
     name: "{{ username }}"
     groups: wheel
     append: yes

@@ -6,7 +6,7 @@
   become: yes
   notify: reboot
   tags: [install, locale]
-  
+
 - name: set locale for sessions
   lineinfile:
     path: /etc/locale.conf

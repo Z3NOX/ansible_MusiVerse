@@ -8,11 +8,9 @@
 - name: initialize pacman keyring
   command: "pacman-key --init"
   when: not gnupg.stat.exists
-  become: yes
   tags: [pacman]
 
 - name: populate keyring
   command: "pacman-key --populate {{ keyring }}"
   when: not gnupg.stat.exists
-  become: yes
   tags: [pacman]

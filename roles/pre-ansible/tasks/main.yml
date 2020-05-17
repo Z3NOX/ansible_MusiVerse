@@ -6,7 +6,10 @@
   raw: systemctl stop systemd-resolved.service
 
 - name: install python
-  raw: "pacman-key --init && pacman-key --populate {{ keyring }} && pacman --noconfirm -Syy && pacman --noconfirm -S python"
+  raw: "pacman-key --init && \
+        pacman-key --populate {{ keyring }} &&\
+        pacman --noconfirm -Syy && \
+        pacman --noconfirm -S python"
   register: raw
 
   # - debug:
