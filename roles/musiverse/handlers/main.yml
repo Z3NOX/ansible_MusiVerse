@@ -1,0 +1,14 @@
+- name: update search data
+  command:
+    argv:
+      - /usr/bin/python
+      - "/home/{{ username }}/combine_search_data.py"
+      - -i
+      - /srv/http/search-data.json
+      - /srv/http/_site/assets/js/search-data.json
+      - -o
+      - /srv/http/_site_static/assets/js/search-data.json
+
+- name: reboot
+  command: "reboot"
+  become: yes

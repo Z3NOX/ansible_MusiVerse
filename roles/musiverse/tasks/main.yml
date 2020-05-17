@@ -1,0 +1,41 @@
+---
+
+- name: write tmux start into bashrc
+  blockinfile:
+    name: "/home/{{ username }}/.bashrc"
+    block: |
+      if [ -z "$TMUX" ] && [ -n "$SSH_TTY" ] && [[ $- =~ i ]]; then
+          tmux attach-session -t ssh || tmux new-session -s ssh
+          exit
+      fi
+  tags: [install_musiverse]
+
+- name: register overwrite update_musiverse hook with never tag
+  command: "echo nonesense"
+  register: force_update
+  tags: [never]
+
+- name: setup nginx
+  include_tasks:
+    file: nginx-setup.yml
+    apply:
+      tags: [nginx, install_musiverse]
+      become_user: root
+      become: yes
+
+- name: copy and place static content
+  include_tasks:
+    file: musiverse-static.yml
+
+- name: enroll dynamic content using the github repository
+  include_tasks:
+    file: musiverse-dynamic.yml
+
+- name: setup wifi
+  include_tasks:
+    file: wifi-setup.yml
+    apply:
+      tags: [wifi, install_musiverse]
+      become_user: root
+      become: yes
+  tags: [install_musiverse, wifi]

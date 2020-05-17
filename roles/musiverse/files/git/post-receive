@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# An example hook script to prepare a packed repository for use over
+# dumb transports.
+#
+# To enable this hook, rename this file to "post-update".
+
+# exec git update-server-info
+cd /home/muser/musiverse/
+git pull
+/usr/bin/bundler exec jekyll build
+rsync -ria --delete --chown=muser:http /home/muser/musiverse/_site/ /srv/http/_site/
+
+touch /tmp/gitupdate.test

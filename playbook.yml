@@ -82,4 +82,3 @@
         localSSID: "WifiSSID"
         # create Passphrase using `wpa_passphrase $localSSID`:
         localPSK: "fe49c00ad13a710319387443df8466979b4fe0348dc0f5c74ca2200b84a8279b"
-      when: no

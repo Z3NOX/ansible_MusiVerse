@@ -1,0 +1,43 @@
+---
+
+- name: Copy nginx config
+  copy:
+      src: "nginx/nginx.conf"
+      dest: "/etc/nginx/nginx.conf"
+  register: nginxconfig
+
+- name: create folder for nginx static site
+  file:
+      path: "/srv/http/_site_static"
+      state: directory
+      owner: muser
+      group: http
+
+- name: create folder for nginx dynamic site
+  file:
+      path: "/srv/http/_site"
+      state: directory
+      owner: muser
+      group: http
+
+- name: test nginx configuration
+  command: "nginx -t"
+  when: nginxconfig.changed
+  register: nginxconfigtest
+
+- name: enable nginx service
+  systemd:
+      name: nginx
+      enabled: yes
+  register: nginxstatus
+
+#  - debug:
+#    msg: "{{ nginxstatus }}"
+
+- name: restart nginx service if running
+  systemd:
+      name: nginx
+      state: restarted
+  when: (nginxstatus.status.ActiveState == "active") and
+        (nginxconfigtest.rc is defined) and
+        (nginxconfigtest.rc == 0)

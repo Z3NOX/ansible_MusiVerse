@@ -1,0 +1,58 @@
+- debug:
+    msg: "{{ static_content_copied }}"
+
+- name: create bare git repo for files
+  git:
+    repo: "{{ musiverse_repo }}"
+    dest: "/home/{{ username }}/git/musiverse"
+    bare: yes
+  tags: [update_musiverse, install_musiverse, wifi, nginx]
+
+- name: clone repo locally
+  git:
+    repo: "/home/{{ username }}/git/musiverse"
+    dest: "/home/{{ username }}/musiverse"
+  register: repo_update
+  tags: [update_musiverse, install_musiverse, wifi, nginx]
+
+- name: copy post-receive hook to bare repo
+  copy:
+    src: "git/post-receive"
+    dest: "/home/{{ username }}/git/musiverse/hooks"
+    mode: 0755
+  tags: [install_musiverse]
+
+- name: copy search merging script to home dir
+  copy:
+    src: "combine_search_data.py"
+    dest: "/home/{{ username }}/"
+    mode: 0644
+  tags: [install_musiverse]
+
+- name: install bundler packages
+  command:
+    cmd: "bundler install --path=."
+    chdir: "/home/{{ username }}/musiverse"
+  when: repo_update.changed or force_update is defined
+  tags: [install_musiverse]
+
+- name: generate dynamic site with jekyll
+  command:
+    cmd: "bundler exec jekyll build --incremental -d /srv/http/_site/"
+    chdir: "/home/{{ username }}/musiverse"
+  when: repo_update.changed or force_update is defined
+  notify: update search data
+  tags: [update_musiverse]
+
+- name: change site's permissions
+  file:
+    dest: "/srv/http/_site"
+    state: directory
+    recurse: yes
+    owner: "{{ username }}"
+    group: http
+    mode: 0774
+  when: repo_update.changed or force_update is defined
+  become_user: root
+  become: yes
+  tags: [update_musiverse]
