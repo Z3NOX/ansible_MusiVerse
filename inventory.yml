@@ -11,4 +11,5 @@ all:
       ansible_host: 192.168.0.42
       ansible_user: alarm
       ansible_ssh_pass: alarm
+      ansible_become_pass: root
       ansible_ssh_common_args: "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
