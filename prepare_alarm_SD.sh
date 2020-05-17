@@ -58,7 +58,10 @@ Description='installed via prepare_SD_RPi.sh'
 Interface=wlan0
 Connection=wireless
 Security=wpa
-IP=dhcp
+IP=static
+Address=('192.168.0.111/24')
+Gateway=('192.168.0.1')
+DNS=('192.168.0.1' '8.8.8.8')
 ESSID=${SSID}
 Key=${PASS}
 EOF
@@ -85,3 +88,4 @@ EOF
 
     umount root boot
 fi
+rmdir root boot
