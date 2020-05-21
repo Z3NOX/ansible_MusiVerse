@@ -67,16 +67,14 @@
           - ruby-bundler
           - bind-tools
           - tmux
-          - nginx
           - htop
           - jq
       tags: [common]
 
-    - include_role:
+    - import_role:
         name: musiverse
-        apply:
-          become_user: "{{ username }}"
-          tags: [musiverse]
+      become_user: "{{ username }}"
+      tags: [musiverse]
       vars:
         musiverse_repo: "https://github.com/Z3NOX/MusiVerse.git"
         localSSID: "WifiSSID"

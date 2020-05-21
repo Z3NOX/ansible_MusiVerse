@@ -16,20 +16,15 @@
   tags: [never]
 
 - name: setup nginx
-  include_tasks:
-    file: nginx-setup.yml
-    apply:
-      tags: [nginx, install_musiverse]
-      become_user: root
-      become: yes
+  import_tasks: nginx-setup.yml
+  become_user: root
+  become: yes
 
 - name: copy and place static content
-  include_tasks:
-    file: musiverse-static.yml
+  import_tasks: musiverse-static.yml
 
 - name: enroll dynamic content using the github repository
-  include_tasks:
-    file: musiverse-dynamic.yml
+  import_tasks: musiverse-dynamic.yml
 
 - name: setup wifi
   include_tasks:

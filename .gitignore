@@ -1,4 +1,5 @@
 root
 boot
 inventory.yml
+galaxy/*
 _static_site.tar.bz2

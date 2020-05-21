@@ -1,43 +1,83 @@
 ---
+- name: install nginx
+  become: true
+  become_user: root
+  tags: [nginx]
+  block:
+    - name: install nginx, fcgiwrap
+      pacman:
+        name: [nginx, fcgiwrap]
+        state: present
 
-- name: Copy nginx config
-  copy:
-      src: "nginx/nginx.conf"
-      dest: "/etc/nginx/nginx.conf"
-  register: nginxconfig
+    - name: Copy nginx config
+      copy:
+          src: "nginx/nginx.conf"
+          dest: "/etc/nginx/nginx.conf"
+      register: nginxconfig
 
-- name: create folder for nginx static site
-  file:
-      path: "/srv/http/_site_static"
-      state: directory
-      owner: muser
-      group: http
+    - name: Copy fcgiwrap_params config
+      copy:
+          src: "nginx/fcgiwrap_params"
+          dest: "/etc/nginx/fcgiwrap_params"
+      # enable fgci scripts
+      # https://wiki.archlinux.org/index.php/Nginx#fcgiwrap
 
-- name: create folder for nginx dynamic site
-  file:
-      path: "/srv/http/_site"
-      state: directory
-      owner: muser
-      group: http
+    - name: create folders for nginx
+      file:
+          path: "{{ item }}"
+          state: directory
+          owner: muser
+          group: http
+      with_items:
+        - "/srv/http/_site_static"
+        - "/srv/http/_site"
+        - "/srv/http/cgi-bin"
 
-- name: test nginx configuration
-  command: "nginx -t"
-  when: nginxconfig.changed
-  register: nginxconfigtest
+    - name: Copy cgi-scripts
+      copy:
+        src: "nginx/{{ item }}"
+        dest: "/srv/http/cgi-bin/{{ item }}"
+        owner: muser
+        group: http
+        mode: 0752
+      with_items:
+        - "shutdown.cgi"
 
-- name: enable nginx service
-  systemd:
-      name: nginx
-      enabled: yes
-  register: nginxstatus
+    - name: add sudoers file to /etc/sudoers.d
+      copy:
+        src: "sudoers/{{ item }}"
+        dest: "/etc/sudoers.d/{{ item }}"
+        owner: root
+        group: root
+        mode: 0750
+        validate: "/usr/bin/visudo -cf %s"
+      with_items:
+        - "shutdown"
 
-#  - debug:
-#    msg: "{{ nginxstatus }}"
+    - name: test nginx configuration
+      command: "nginx -t"
+      when: nginxconfig.changed
+      register: nginxconfigtest
 
-- name: restart nginx service if running
-  systemd:
-      name: nginx
-      state: restarted
-  when: (nginxstatus.status.ActiveState == "active") and
-        (nginxconfigtest.rc is defined) and
-        (nginxconfigtest.rc == 0)
+    - name: enable nginx service
+      systemd:
+          name: nginx.service
+          enabled: yes
+          state: restarted
+      register: nginxstatus
+
+    - name: enable fcgiwrap.socket
+      systemd:
+          name: fcgiwrap.socket
+          enabled: yes
+
+    #  - debug:
+    #    msg: "{{ nginxstatus }}"
+
+    # - name: restart nginx service if running
+    #   systemd:
+    #       name: nginx
+    #       state: restarted
+    #   when: (nginxstatus.status.ActiveState == "active") and
+    #         (nginxconfigtest.rc is defined) and
+    #         (nginxconfigtest.rc == 0)
