@@ -27,10 +27,6 @@
   import_tasks: musiverse-dynamic.yml
 
 - name: setup wifi
-  include_tasks:
-    file: wifi-setup.yml
-    apply:
-      tags: [wifi, install_musiverse]
-      become_user: root
-      become: yes
-  tags: [install_musiverse, wifi]
+  import_tasks: wifi-setup.yml
+  become_user: root
+  become: yes

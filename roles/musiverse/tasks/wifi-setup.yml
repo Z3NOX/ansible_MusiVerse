@@ -1,100 +1,103 @@
 ---
-- name: identify existance of wap0 device
-  stat:
-    path: "/sys/class/net/wap0/address"
-  register: wap0_exist
-
-- name: get wap0 macadress
-  set_fact:
-    wap_if: "{{ 'wap0' if wap0_exist.stat.exists else 'wlan0' }}"
-
-- name: get wap interface's macaddress
-  slurp:
-    src: "/sys/class/net/{{ wap_if }}/address"
-  register: ap_mac
-
-- debug:
-    msg: "ap_mac: {{ ap_mac['content'] | b64decode }}"
-
-# udev debug:
-# udevadm control --reload-rules
-# udevadm monitor --udev
-# udevadm test /sys/class/net/wlan0
-- name: confirm wap0 to wap0
-  blockinfile:
-    create: yes
-    path: "/etc/udev/rules.d/70-my_network_interfaces.rules"
-    owner: "root"
-    block: |
-      # Built-in wifi interface used in hostapd - identify device by MAC address
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ ap_mac['content'] | b64decode | regex_replace('\n', '') }}", NAME="wap0"
-      # reinitialize create_ap on new wlan0 device
-      SUBSYSTEM=="net", ACTION=="add", RUN+="/usr/bin/systemctl --no-block restart create_ap.service"
-      SUBSYSTEM=="net", ACTION=="remove", RUN+="/usr/bin/systemctl --no-block restart create_ap.service"
-  notify: reboot
-
-- name: clone create_api git repo from fork
-  git:
-    repo: "https://github.com/Z3NOX/create_ap.git"
-    dest: "/home/{{ username }}/git/create_ap"
-  become_user: "{{ username }}"
-
-- name: check existance of create_ap
-  stat:
-    path: "/usr/bin/create_ap"
-  register: create_ap
-
-- name: install create_ap
-  make:
-    chdir: "/home/{{ username }}/git/create_ap"
-    target: install
-  when: not create_ap.stat.exists
-
-- name: copy configuration of create_ap
-  copy:
-    src: "create_ap/create_ap.conf"
-    dest: "/etc/create_ap.conf"
-  register: createapconfig
-
-- name: make sure /etc/hosts resolves hostname correctly
-  blockinfile:
-    path: "/etc/hosts"
-    block: |
-          192.168.42.1  musiverse.local musiverse
-
-- name: enable create_ap
-  systemd:
-    name: create_ap
-    enabled: yes
-  register: createapstatus
-
-- name: restart create_ap serice if running
-  systemd:
-    name: create_ap
-    state: restarted
-  when: createapconfig.changed and createapstatus.status.ActiveState == "active"
-
-- name: configure wlan0 to be connect to local wifi
-  blockinfile:
-    create: yes
-    owner: "root"
-    mode: 0600
-    path: "/etc/netctl/wlan0-{{ localSSID }}"
-    block: |
-      Description='Installed via MusiVerse-ansible installer'
-      Interface=wlan0
-      Connection=wireless
-      Security=wpa
-      ESSID={{ localSSID }}
-      IP=dhcp
-      Key=\"{{ localPSK }}
-
-- name: activate auto-netctl on wlan0
-  systemd:
-    name: netctl-auto@wlan0
-    enabled: yes
-
-- name: deactivate wpa_supplicant service for wlan0
-  systemd:
-    name: wpa_supplicant@wlan0
-    enabled: no
+- name: Setup wifi
+  tags: [wifi, install_musiverse]
+  block:
+    - name: identify existance of wap0 device
+      stat:
+        path: "/sys/class/net/wap0/address"
+      register: wap0_exist
+    
+    - name: get wap0 macadress
+      set_fact:
+        wap_if: "{{ 'wap0' if wap0_exist.stat.exists else 'wlan0' }}"
+    
+    - name: get wap interface's macaddress
+      slurp:
+        src: "/sys/class/net/{{ wap_if }}/address"
+      register: ap_mac
+    
+    - debug:
+        msg: "ap_mac: {{ ap_mac['content'] | b64decode }}"
+    
+    # udev debug:
+    # udevadm control --reload-rules
+    # udevadm monitor --udev
+    # udevadm test /sys/class/net/wlan0
+    - name: confirm wap0 to wap0
+      blockinfile:
+        create: yes
+        path: "/etc/udev/rules.d/70-my_network_interfaces.rules"
+        owner: "root"
+        block: |
+          # Built-in wifi interface used in hostapd - identify device by MAC address
+          SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="{{ ap_mac['content'] | b64decode | regex_replace('\n', '') }}", NAME="wap0"
+          # reinitialize create_ap on new wlan0 device
+          SUBSYSTEM=="net", ACTION=="add", RUN+="/usr/bin/systemctl --no-block restart create_ap.service"
+          SUBSYSTEM=="net", ACTION=="remove", RUN+="/usr/bin/systemctl --no-block restart create_ap.service"
+      notify: reboot
+    
+    - name: clone create_api git repo from fork
+      git:
+        repo: "https://github.com/Z3NOX/create_ap.git"
+        dest: "/home/{{ username }}/git/create_ap"
+      become_user: "{{ username }}"
+    
+    - name: check existance of create_ap
+      stat:
+        path: "/usr/bin/create_ap"
+      register: create_ap
+    
+    - name: install create_ap
+      make:
+        chdir: "/home/{{ username }}/git/create_ap"
+        target: install
+      when: not create_ap.stat.exists
+    
+    - name: copy configuration of create_ap
+      copy:
+        src: "create_ap/create_ap.conf"
+        dest: "/etc/create_ap.conf"
+      register: createapconfig
+    
+    - name: make sure /etc/hosts resolves hostname correctly
+      blockinfile:
+        path: "/etc/hosts"
+        block: |
+              192.168.42.1  musiverse.local musiverse
+    
+    - name: enable create_ap
+      systemd:
+        name: create_ap
+        enabled: yes
+      register: createapstatus
+    
+    - name: restart create_ap serice if running
+      systemd:
+        name: create_ap
+        state: restarted
+      when: createapconfig.changed and createapstatus.status.ActiveState == "active"
+    
+    - name: configure wlan0 to be connect to local wifi
+      blockinfile:
+        create: yes
+        owner: "root"
+        mode: 0600
+        path: "/etc/netctl/wlan0-{{ localSSID }}"
+        block: |
+          Description='Installed via MusiVerse-ansible installer'
+          Interface=wlan0
+          Connection=wireless
+          Security=wpa
+          ESSID={{ localSSID }}
+          IP=dhcp
+          Key=\"{{ localPSK }}
+    
+    - name: activate auto-netctl on wlan0
+      systemd:
+        name: netctl-auto@wlan0
+        enabled: yes
+    
+    - name: deactivate wpa_supplicant service for wlan0
+      systemd:
+        name: wpa_supplicant@wlan0
+        enabled: no
