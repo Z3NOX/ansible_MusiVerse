@@ -6,14 +6,15 @@
     repo: "{{ musiverse_repo }}"
     dest: "/home/{{ username }}/git/musiverse"
     bare: yes
-  tags: [update_musiverse, install_musiverse, wifi, nginx]
+  tags: [update_musiverse, install_musiverse]
 
 - name: clone repo locally
   git:
     repo: "/home/{{ username }}/git/musiverse"
     dest: "/home/{{ username }}/musiverse"
+    force: yes
   register: repo_update
-  tags: [update_musiverse, install_musiverse, wifi, nginx]
+  tags: [update_musiverse, install_musiverse]
 
 - name: copy post-receive hook to bare repo
   copy:
