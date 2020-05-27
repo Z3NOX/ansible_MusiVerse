@@ -1,2 +1,2 @@
 #!/bin/sh
-date >> /tmp/fcgiwrap.log
+sudo shutdown -h now
