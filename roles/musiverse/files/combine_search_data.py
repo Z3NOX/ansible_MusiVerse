@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import hashlib
 import argparse
 
 p = argparse.ArgumentParser()
@@ -15,11 +16,13 @@ maxentries = 0
 for inputfile in args.input:
     with inputfile as file:
         searchdata = json.load(file)
-    for key in searchdata:
-        gather_dict[maxentries + int(key)] = searchdata[key]
+    for key, value in searchdata.items():
+        content_hash = hashlib.sha512(value["content"].encode("utf-8")).hexdigest()
+        gather_dict[content_hash] = value
 
-    maxentries = max([int(x) for x in gather_dict.keys()])
-
+output_dict = {}
+for i, key in enumerate(gather_dict):
+    output_dict[i] = gather_dict[key]
 
 with args.output as file:
-    json.dump(gather_dict, file)
+    json.dump(output_dict, file)
