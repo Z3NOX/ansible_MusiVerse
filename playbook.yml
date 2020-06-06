@@ -53,12 +53,16 @@
         timezone: "Europe/Berlin"
         locale: "de_DE.UTF-8"
         disable_ipv6: yes
+        services:
+          # service name: containing package
+          ntpd: ntp
+          cronie: cronie
         packages:
           - pbzip2
           - dnsmasq
           - hostapd
-          - ntp
-          - cronie
+          - ntp      # Todo: enable service
+          - cronie   # Todo: enable service
           - sudo
           - rsync
           - git
@@ -80,3 +84,10 @@
         localSSID: "WifiSSID"
         # create Passphrase using `wpa_passphrase $localSSID`:
         localPSK: "fe49c00ad13a710319387443df8466979b4fe0348dc0f5c74ca2200b84a8279b"
+        packages:
+          Kinderlieder: {'state': "present", 'name': "Kinderlieder"}
+          Schlaflieder: {'state': "present", 'name': "Schlaflieder"}
+          Volkslieder: {'state': "absent", 'name': "Volkslieder"}
+          Folk_Gospel: {'state': "present", 'name': "Folk & Gospel"}
+          Weihnachtslieder: {'state': "absent", 'name': "Weihnachtslieder"}
+          Sonstiges: {'state': "present", 'name': "weitere Lieder"}

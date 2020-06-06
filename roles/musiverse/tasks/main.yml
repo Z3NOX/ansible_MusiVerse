@@ -1,4 +1,8 @@
 ---
+- name: include vars
+  include_vars:
+    file: combine_search.yml
+  tags: [always]
 
 - name: write tmux start into bashrc
   blockinfile:
@@ -10,6 +14,15 @@
       fi
   tags: [install_musiverse]
 
+- name: make sure sytemd-resolved is not enabled to suppress DNSSEC
+  service:
+    name: systemd-resolved.service
+    enabled: "no"
+    state: "stopped"
+  become_user: "root"
+  become: "yes"
+  tags: [dns, systemd]
+
 - name: register overwrite update_musiverse hook with never tag
   command: "echo nonesense"
   register: force_update
@@ -20,8 +33,12 @@
   become_user: root
   become: yes
 
-- name: copy and place static content
+- name: add static packages
   import_tasks: musiverse-static.yml
+
+- debug:
+    msg: "basic_combine_command: {{ basic_combine_command }}"
+  tags: [static_content]
 
 - name: enroll dynamic content using the github repository
   import_tasks: musiverse-dynamic.yml

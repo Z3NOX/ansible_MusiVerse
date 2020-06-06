@@ -1,13 +1,38 @@
+---
+
+- name: create static search directory
+  file:
+    path: /srv/http/_site_static/assets/js/
+    owner: "{{ username }}"
+    group: "http"
+    state: directory
+  become: 'yes'
+  become_user: 'root'
+
+- name: generate dynamic site
+  command:
+    cmd: "bundler exec jekyll build --incremental -d /srv/http/_site/"
+    chdir: "/home/{{ username }}/musiverse"
+  notify:
+    - update search data
+    - change site permissions
+
+- name: change site permissions
+  file:
+    dest: "/srv/http/_site"
+    state: directory
+    recurse: yes
+    owner: "{{ username }}"
+    group: http
+    mode: 0774
+  become: 'yes'
+  become_user: 'root'
+
 - name: update search data
   command:
-    argv:
-      - /usr/bin/python
-      - "/home/{{ username }}/combine_search_data.py"
-      - -i
-      - /srv/http/search-data.json
-      - /srv/http/_site/assets/js/search-data.json
-      - -o
-      - /srv/http/_site_static/assets/js/search-data.json
+    argv: "{{ basic_combine_command }}"
+  become: 'yes'
+  become_user: 'root'
 
 - name: reboot
   command: "reboot"

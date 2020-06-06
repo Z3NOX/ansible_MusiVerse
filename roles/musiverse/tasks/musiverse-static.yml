@@ -1,38 +1,21 @@
-- name: check static content
-  stat:
-    path: "_static_site.tar.bz2"
-  vars:
-    ansible_connection: local
-  register: static_content
+---
 
-- name: move archive to target
-  copy:
-    src: "_static_site.tar.bz2"
-    dest: "/home/{{ username }}/"
-  when: static_content.stat.exists
-  register: static_content_copied
+- name: copy and place static content
+  include_tasks: add-package.yml
+  with_dict: "{{ packages }}"
+  when: "item.value.state == 'present'"
+  tags: [static_content]
 
-- name: copy static site content
-  block:
-  - name: unarchive static site content
-    unarchive:
-      src: "/home/{{ username }}/_static_site.tar.bz2"
-      dest: "/srv/http/_site_static/"
-      remote_src: yes
-      owner: "{{ username }}"
-      group: http
-      mode: 0774
-      directory_mode: 0774
-    notify: update search data
+- name: add package search data to combine command
+  set_fact:
+    basic_combine_command: "{{ basic_combine_command + ['/home/' + username +'/_site/assets/js/search-data-' + item.key + '.json'] }}"
+  with_dict: "{{ packages }}"
+  when: "item.value.state == 'present'"
+  tags: [static_content]
 
-  - name: safe static content's search data
-    copy:
-      src: "/srv/http/_site_static/assets/js/search-data.json"
-      dest: "/srv/http/search-data.json"
-      remote_src: yes
-      owner: "{{ username }}"
-    notify: update search data
-  when: static_content_copied.changed is defined and
-        static_content_copied.changed
-  become_user: root
-  become: yes
+- name: copy package overview markdown template
+  template:
+    src: "Pakete/index.md"
+    dest: "/home/{{ username }}/musiverse/Pakete/"
+  notify: generate dynamic site 
+  tags: [static_content]

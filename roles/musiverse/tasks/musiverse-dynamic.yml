@@ -14,6 +14,7 @@
     dest: "/home/{{ username }}/musiverse"
     force: yes
   register: repo_update
+  notify: generate dynamic site
   tags: [update_musiverse, install_musiverse]
 
 - name: copy post-receive hook to bare repo
@@ -37,23 +38,3 @@
   when: repo_update.changed or force_update is defined
   tags: [install_musiverse]
 
-- name: generate dynamic site with jekyll
-  command:
-    cmd: "bundler exec jekyll build --incremental -d /srv/http/_site/"
-    chdir: "/home/{{ username }}/musiverse"
-  when: repo_update.changed or force_update is defined
-  notify: update search data
-  tags: [update_musiverse]
-
-- name: change site's permissions
-  file:
-    dest: "/srv/http/_site"
-    state: directory
-    recurse: yes
-    owner: "{{ username }}"
-    group: http
-    mode: 0774
-  when: repo_update.changed or force_update is defined
-  become_user: root
-  become: yes
-  tags: [update_musiverse]

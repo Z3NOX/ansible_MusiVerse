@@ -1,0 +1,9 @@
+---
+
+basic_combine_command:
+  - /usr/bin/python
+  - "/home/{{ username }}/combine_search_data.py"
+  - -o
+  - "/srv/http/_site_static/assets/js/search-data.json"
+  - -i
+  - "/srv/http/_site/assets/js/search-data.json"

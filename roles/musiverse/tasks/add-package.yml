@@ -1,0 +1,46 @@
+- name: "copy and extract package"
+  tags: ["static_content"]
+  block:
+    - name: "create package in _site_static folder"
+      file:
+        path: "/srv/http/_site_static/Pakete/"
+        state: directory
+        owner: "{{ username }}"
+        group: "http"
+      become_user: "root"
+      become: "yes"
+
+    - name: copy static site content
+      # when: static_content.stat.exists
+      block:
+        - name: move archive to target
+          copy:
+            src: "pkg_{{ item.key }}.tar.bz2"
+            dest: "/home/{{ username }}/"
+          register: static_content_copied
+
+        - name: unarchive static site content
+          unarchive:
+            src: "/home/{{ username }}/pkg_{{ item.key }}.tar.bz2"
+            dest: "/home/{{ username }}/"
+            remote_src: yes
+            owner: "{{ username }}"
+            # group: http
+            mode: 0774
+            directory_mode: 0774
+          notify:
+            - create static search directory
+            - update search data
+
+        - name: copy static content from home-dir into _site_static
+          copy:
+            src: "/home/{{ username }}/_site/Pakete/{{ item.key }}"
+            dest: "/srv/http/_site_static/Pakete/"
+            remote_src: "yes"
+            owner: "{{ username }}"
+            group: "http"
+            mode: 0774
+          become_user: "root"
+          become: "yes"
+
+  #### end block
