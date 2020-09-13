@@ -26,8 +26,8 @@ label-id: 0x0e360891
 device: /dev/mmcblk0
 unit: sectors
 
-/dev/mmcblk0p1 : start=        2048, size=      204800, type=c
-/dev/mmcblk0p2 : start=      206848, type=83
+/dev/mmcblk0p1 : start=        2048, size=      409600, type=c
+/dev/mmcblk0p2 : start=      413696, type=83
 EOF
 
 mkfs.vfat ${device}p1
@@ -51,7 +51,7 @@ else
     echo "Create default WIFI connection"
     SSID=$3
     PASS=$4
-    if [ "$(cat root/etc/hostname)" == "alarm" ]; then
+    if [ "$(cat root/etc/hostname)" == "alarmpi" ]; then
         echo "configure wifi using arch linux netctl configuration"
         cat << EOF >> root/etc/netctl/wlan0-${SSID}
 Description='installed via prepare_SD_RPi.sh'
