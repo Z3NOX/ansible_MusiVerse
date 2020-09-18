@@ -9,8 +9,10 @@
   raw: "pacman-key --init && \
         pacman-key --populate {{ keyring }} &&\
         pacman --noconfirm -Syy && \
+        pacman --noconfirm -Syu && \
         pacman --noconfirm -S python"
   register: raw
+  tags: [pacman, python]
 
   # - debug:
   #     msg: "{{ raw.stdout }}"
