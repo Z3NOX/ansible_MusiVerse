@@ -6,16 +6,3 @@
   when: "item.value.state == 'present'"
   tags: [static_content]
 
-- name: add package search data to combine command
-  set_fact:
-    basic_combine_command: "{{ basic_combine_command + ['/home/' + username +'/_site/assets/js/search-data-' + item.key + '.json'] }}"
-  with_dict: "{{ packages }}"
-  when: "item.value.state == 'present'"
-  tags: [static_content]
-
-- name: copy package overview markdown template
-  template:
-    src: "Pakete/index.md"
-    dest: "/home/{{ username }}/musiverse/Pakete/"
-  notify: generate dynamic site 
-  tags: [static_content]
