@@ -17,7 +17,7 @@
 - name: make sure sytemd-resolved is not enabled to suppress DNSSEC
   service:
     name: systemd-resolved.service
-    enabled: "no"
+    enabled: "yes"
     state: "stopped"
   become_user: "root"
   become: "yes"
@@ -26,7 +26,8 @@
 - name: register overwrite update_musiverse hook with never tag
   command: "echo nonesense"
   register: force_update
-  tags: [never]
+  notify: generate dynamic site
+  tags: [update_musiverse, never]
 
 - name: setup nginx
   import_tasks: nginx-setup.yml
