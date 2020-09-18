@@ -51,39 +51,51 @@ else
     echo "Create default WIFI connection"
     SSID=$3
     PASS=$4
+    if="wlan0"
     if [ "$(cat root/etc/hostname)" == "alarmpi" ]; then
         echo "configure wifi using arch linux netctl configuration"
-        cat << EOF >> root/etc/netctl/wlan0-${SSID}
+        cat << EOF >> root/etc/netctl/${if}${SSID}
 Description='installed via prepare_SD_RPi.sh'
-Interface=wlan0
+Interface=${if}
 Connection=wireless
 Security=wpa
-IP=static
-Address=('192.168.0.111/24')
-Gateway=('192.168.0.1')
-DNS=('192.168.0.1' '8.8.8.8')
+Country=DE
+IP=dhcp
 ESSID=${SSID}
 Key=${PASS}
 EOF
-        mkdir -p root/etc/systemd/system/sys-subsystem-net-devices-wlan0.device.wants
+        # # netctl-auto method
+        # mkdir -p root/etc/systemd/system/sys-subsystem-net-devices-${if}.device.wants
+        # ln -s \
+        #     /usr/lib/systemd/system/netctl-auto@.service \
+        #     root/etc/systemd/system/sys-subsystem-net-devices-${if}.device.wants/netctl-auto@${if}.service
+
+        # netctl enable method
+        mkdir -p "root/etc/systemd/system/netctl@${if}${SSID}.service.d"
         ln -s \
-            /usr/lib/systemd/system/netctl-auto@.service \
-            root/etc/systemd/system/sys-subsystem-net-devices-wlan0.device.wants/netctl-auto@wlan0.service
+            /usr/lib/systemd/system/netctl@.service \
+            root/etc/systemd/system/multi-user.target.wants/netctl@${if}${SSID}.service
+        cat << EOF >> "root/etc/systemd/system/netctl@${if}${SSID}.service.d/profile.conf"
+[Unit]
+Descritpion=prepare_SD_RPi.sh
+BindsTo=sys-subsystem-net-devices-${if}.device
+Aftero=sys-subsystem-net-devices-${if}.device
+EOF
     elif [ "$(cat root/etc/hostname)" == "raspbian" ]; then
         echo "configure wifi using raspbian wpa_supplicant configuration"
-        cat << EOF >> root/etc/systemd/network/wlan0.network
+        cat << EOF >> root/etc/systemd/network/${if}.network
 [Match]
-Name=wlan0
+Name=${if}
 
 [Network]
 DHCP=yes
 EOF
 
-        wpa_passphrase "${SSID}" "${PASS}" > root/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+        wpa_passphrase "${SSID}" "${PASS}" > root/etc/wpa_supplicant/wpa_supplicant-${if}.conf
         
         ln -s \
            /usr/lib/systemd/system/wpa_supplicant@.service \
-           root/etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
+           root/etc/systemd/system/multi-user.target.wants/wpa_supplicant@${if}.service
     fi
 
     umount root boot
