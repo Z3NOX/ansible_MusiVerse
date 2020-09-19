@@ -39,6 +39,13 @@
   become_user: root
   become: yes
 
+- name: clone musiverse ansible repo locally
+  git:
+    repo: "{{ musiverse_ansible_repo }}"
+    dest: "/home/{{ username }}/musiverse-ansible"
+    force: yes
+  tags: [install_musiverse, git]
+
 - name: add static packages
   import_tasks: musiverse-static.yml
 
