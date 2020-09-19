@@ -26,7 +26,9 @@
 - name: register overwrite update_musiverse hook with never tag
   command: "echo nonesense"
   register: force_update
-  notify: generate dynamic site
+  notify:
+    - create static search directory
+    - generate dynamic site
   tags: [update_musiverse, never]
 
 - name: setup nginx

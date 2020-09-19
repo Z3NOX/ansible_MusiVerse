@@ -16,7 +16,7 @@
     force: yes
   register: repo_update
   notify: generate dynamic site
-  tags: [update_musiverse, install_musiverse]
+  tags: [install_musiverse, git]
 
 - name: copy search merging script to home dir
   copy:
