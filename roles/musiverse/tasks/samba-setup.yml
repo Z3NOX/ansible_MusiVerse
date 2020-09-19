@@ -1,0 +1,56 @@
+---
+- name: install samba
+  become: true
+  become_user: root
+  tags: [samba]
+  block:
+    - name: install samba
+      pacman:
+        name: [samba]
+        state: present
+
+    - name: Copy samba config
+      copy:
+          src: "samba/smb.conf"
+          dest: "/etc/samba/smb.conf"
+          validate: "testparm -s"
+      register: smbconfig
+
+    - name: test samba configuration
+      command: "testparm -s"
+      when: smbconfig.changed
+      register: smbconfigtest
+
+    - name: create samba user
+      shell: >
+        (echo '{{ item }}'; echo '{{ item }}')
+        | smbpasswd -s -a "{{ item }}"
+      register: smbpasswd
+      changed_when: "'Added user' in smbpasswd.stdout"
+      with_items:
+        - "{{ username }}"
+
+    - name: enable samba service
+      systemd:
+          name: smb.service
+          enabled: yes
+          state: restarted
+      register: smbstatus
+
+    - name: enable nmb service
+      systemd:
+          name: nmb.service
+          enabled: yes
+          state: restarted
+      register: smbstatus
+
+    #  - debug:
+    #    msg: "{{ smbstatus }}"
+
+    # - name: restart smb service if running
+    #   systemd:
+    #       name: smb
+    #       state: restarted
+    #   when: (smbstatus.status.ActiveState == "active") and
+    #         (smbconfigtest.rc is defined) and
+    #         (smbconfigtest.rc == 0)

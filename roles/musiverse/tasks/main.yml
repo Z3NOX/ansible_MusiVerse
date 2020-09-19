@@ -34,6 +34,11 @@
   become_user: root
   become: yes
 
+- name: setup samba
+  import_tasks: samba-setup.yml
+  become_user: root
+  become: yes
+
 - name: add static packages
   import_tasks: musiverse-static.yml
 
