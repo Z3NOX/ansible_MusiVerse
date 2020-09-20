@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+Open multiple json files with lunr search data to combine them into one file
+"""
+
+
 import json
 import hashlib
 import argparse
@@ -11,13 +16,18 @@ p.add_argument("--output", "-o", type=argparse.FileType('w'), default="search-da
 
 args = p.parse_args()
 
+# dict to gather/bin the search data based on a hash
+# that symbolize the entries uniqueness
 gather_dict = {}
+
+# simple counter
 maxentries = 0
 for inputfile in args.input:
     with inputfile as file:
         searchdata = json.load(file)
     for key, value in searchdata.items():
-        content_hash = hashlib.sha512(value["content"].encode("utf-8")).hexdigest()
+        # hash over the "title" information
+        content_hash = hashlib.sha512(value["title"].encode("utf-8")).hexdigest()
         gather_dict[content_hash] = value
 
 output_dict = {}
