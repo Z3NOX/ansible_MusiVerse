@@ -2,6 +2,10 @@
 
 all:
   hosts:
+    localhost:
+      connection: local
+      ansible_user: muser
+      ansible_become_pass: muser
     musiverse:
       ansible_host: 192.168.0.42
       ansible_user: muser
