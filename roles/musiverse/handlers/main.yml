@@ -41,6 +41,11 @@
   when: "item.value.state == 'present'"
   listen: update search data
 
+- name: debug combine command
+  debug:
+    msg: "debug command: {{ basic_combine_command }}"
+  listen: update search data
+
 - name: update search data
   command:
     argv: "{{ basic_combine_command }}"
