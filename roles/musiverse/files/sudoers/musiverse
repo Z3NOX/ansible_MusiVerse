@@ -1,1 +1,2 @@
 http ALL= NOPASSWD: /usr/bin/shutdown -h now
+http ALL= (muser) NOPASSWD: /usr/bin/touch /tmp/update_musiverse
