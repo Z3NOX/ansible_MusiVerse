@@ -1,0 +1,17 @@
+---
+
+- name: copy update script
+  copy:
+    src: "onsite_update.sh"
+    dest: "/home/{{ username }}/"
+    mode: "0774"
+    owner: "{{ username }}"
+  tags: ["cron", "onsite"]
+
+- name: activate onsite update via cron
+  cron:
+    name: "activate onsite update"
+    special_time: reboot
+    job: "sleep 20 && sh -c /home/{{ username }}/onsite_update.sh"
+  tags: ["cron", "onsite"] 
+
