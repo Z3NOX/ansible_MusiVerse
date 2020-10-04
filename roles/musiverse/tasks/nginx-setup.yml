@@ -26,7 +26,7 @@
       file:
           path: "{{ item }}"
           state: directory
-          owner: muser
+          owner: "{{ username }}"
           group: http
       with_items:
         - "/srv/http/_site_static"
@@ -37,11 +37,12 @@
       copy:
         src: "nginx/{{ item }}"
         dest: "/srv/http/cgi-bin/{{ item }}"
-        owner: muser
+        owner: "{{ username }}"
         group: http
         mode: 0752
       with_items:
         - "shutdown.cgi"
+        - "update.cgi"
 
     - name: add sudoers file to /etc/sudoers.d
       copy:
@@ -52,7 +53,7 @@
         mode: 0750
         validate: "/usr/bin/visudo -cf %s"
       with_items:
-        - "shutdown"
+        - "musiverse"
 
     - name: test nginx configuration
       command: "nginx -t"
