@@ -30,5 +30,8 @@
     cmd: "bundler install --path=."
     chdir: "/home/{{ username }}/musiverse"
   when: repo_update.changed or force_update is defined
-  tags: [install_musiverse]
 
+- name: update bundler packages
+  command:
+    cmd: "bundler update"
+    chdir: "/home/{{ username }}/musiverse"
