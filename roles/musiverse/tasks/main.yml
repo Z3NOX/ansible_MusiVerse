@@ -48,6 +48,12 @@
     force: yes
   tags: [install_musiverse, git]
 
+- name: copy locally changed ansible playbook
+  copy:
+    src: "playbook.yml"
+    dest: "/home/{{ username }}/musiverse-ansible"
+  tags: ["install_musiverse", "git"]
+
 - name: add static packages
   import_tasks: musiverse-static.yml
 
@@ -62,3 +68,20 @@
   import_tasks: wifi-setup.yml
   become_user: root
   become: yes
+
+- name: setup leds
+  import_tasks: configure-leds.yml
+  become_user: root
+  become: yes
+
+- name: configure onsite musiverse update
+  import_tasks: configure-onsite-update.yml
+
+- name: start cronie
+  service:
+    name: "cronie.service"
+    enabled: "yes"
+    state: "restarted"
+  become_user: "root"
+  become: "yes"
+  tags: ["cron"]
