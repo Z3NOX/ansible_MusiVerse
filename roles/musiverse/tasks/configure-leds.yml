@@ -1,0 +1,17 @@
+---
+
+- name: copy led script
+  copy:
+    src: led_control.sh
+    dest: /root/
+    mode: "0770"
+    owner: "root"
+  tags: ["cron", "leds"]
+
+- name: activate via cron
+  cron:
+    name: "activate leds"
+    special_time: reboot
+    job: "sleep 5 && sh -c /root/led_control.sh"
+  tags: ["cron", "leds"] 
+
