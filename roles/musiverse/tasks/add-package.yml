@@ -27,7 +27,6 @@
             owner: "{{ username }}"
             # group: http
             mode: 0774
-            directory_mode: 0774
           notify:
             - create static search directory
             - update search data
