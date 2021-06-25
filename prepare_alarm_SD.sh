@@ -23,20 +23,20 @@ fi
 sfdisk ${device} << EOF
 label: dos
 label-id: 0x0e360891
-device: /dev/mmcblk0
+device: ${device}
 unit: sectors
 
-/dev/mmcblk0p1 : start=        2048, size=      409600, type=c
-/dev/mmcblk0p2 : start=      413696, type=83
+${device}1 : start=        2048, size=      409600, type=c
+${device}2 : start=      413696, type=83
 EOF
 
-mkfs.vfat ${device}p1
+mkfs.vfat ${device}1
 mkdir -p boot
-mount "${device}p1" boot
+mount "${device}1" boot
 
-mkfs.ext4 ${device}p2
+mkfs.ext4 ${device}2
 mkdir -p root
-mount "${device}p2" root
+mount "${device}2" root
 
 echo "Copy files…"
 bsdtar -xpf ${image} -C root
