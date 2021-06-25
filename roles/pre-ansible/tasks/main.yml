@@ -5,7 +5,7 @@
 - name: stop systemd-resolved time in order for DNSSEC to work.
   raw: systemctl stop systemd-resolved.service
 
-- name: install python
+- name: update and install python
   raw: "pacman-key --init && \
         pacman-key --populate {{ keyring }} &&\
         pacman --noconfirm -Syy && \
