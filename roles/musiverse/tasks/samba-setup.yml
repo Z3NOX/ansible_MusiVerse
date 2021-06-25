@@ -13,7 +13,7 @@
       copy:
           src: "samba/smb.conf"
           dest: "/etc/samba/smb.conf"
-          validate: "testparm -s"
+          validate: "testparm -s %s"
       register: smbconfig
 
     - name: test samba configuration
