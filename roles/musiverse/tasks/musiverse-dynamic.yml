@@ -27,11 +27,11 @@
 
 - name: install bundler packages
   command:
-    cmd: "bundler install --path=."
+    cmd: "bundler-2.7 install --path=."
     chdir: "/home/{{ username }}/musiverse"
   when: repo_update.changed or force_update is defined
 
 - name: update bundler packages
   command:
-    cmd: "bundler update"
+    cmd: "bundler-2.7 update"
     chdir: "/home/{{ username }}/musiverse"

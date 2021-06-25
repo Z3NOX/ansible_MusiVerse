@@ -17,7 +17,7 @@
 
 - name: generate dynamic site
   command:
-    cmd: "bundler exec jekyll build -d /srv/http/_site/"
+    cmd: "bundler-2.7 exec jekyll build -d /srv/http/_site/"
     chdir: "/home/{{ username }}/musiverse"
   notify:
     - update search data
